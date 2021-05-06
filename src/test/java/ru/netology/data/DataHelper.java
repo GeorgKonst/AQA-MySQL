@@ -8,11 +8,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DataHelper {
-    String url = "jdbc:mysql://localhost:3306/app";
-    String user = "app";
-    String password = "9mREsvXDs9Gk89Ef";
+    private static String url = "jdbc:mysql://localhost:3306/app";
+    private static String user = "app";
+    private static String password = "9mREsvXDs9Gk89Ef";
 
-    public DataHelper() {}
+    private DataHelper() {}
 
     @Value
     public static class AuthInfo {
@@ -20,30 +20,33 @@ public class DataHelper {
         private String password;
     }
 
-    public void cleanData() throws SQLException {
+    public static void cleanData() throws SQLException {
         QueryRunner runner = new QueryRunner();
         val codes = "DELETE FROM auth_codes";
+        val cards = "DELETE FROM cards";
+        val users = "DELETE FROM users";
 
         try (
                 val conn = DriverManager.getConnection(url, user, password);
         ) {
             runner.update(conn, codes);
-
+            runner.update(conn, cards);
+            runner.update(conn, users);
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public AuthInfo getAuthInfo() {
+    public static AuthInfo getAuthInfo() {
         return new AuthInfo("vasya", "qwerty123");
     }
 
     @Value
-    public class VerificationCode {
+    public static class VerificationCode {
         private String code;
     }
 
-    public String getUserId() {
+    public static String getUserId() {
         val getUserId = "SELECT id FROM users WHERE login = 'vasya';";
         try (
                 val connect = DriverManager.getConnection(url, user, password);
@@ -61,7 +64,7 @@ public class DataHelper {
         return null;
     }
 
-    public String getVerificationCode() {
+    public static String getVerificationCode() {
         val requestCode = "SELECT code FROM auth_codes WHERE user_id = ? ORDER BY created DESC LIMIT 1;";
 
         try (
@@ -82,19 +85,19 @@ public class DataHelper {
         return null;
     }
 
-    public AuthInfo getInvalidLogin() {
+    public static AuthInfo getInvalidLogin() {
         return new AuthInfo("notvalid", "qwerty123");
     }
 
-    public AuthInfo getInvalidPassword() {
+    public static AuthInfo getInvalidPassword() {
         return new AuthInfo("vasya", "qqqqqqqq");
     }
 
-    public String invalidPassword() {
+    public static String invalidPassword() {
         return "aaaaaaa";
     }
 
-    public String getInvalidVerificationCode() {
+    public static String getInvalidVerificationCode() {
         return "111111";
     }
 

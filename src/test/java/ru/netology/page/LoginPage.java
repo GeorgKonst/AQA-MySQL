@@ -5,6 +5,8 @@ import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.Keys;
 import ru.netology.data.DataHelper;
 
+import javax.xml.crypto.Data;
+
 import static com.codeborne.selenide.Selenide.$;
 
 public class LoginPage {
@@ -13,17 +15,18 @@ public class LoginPage {
     private SelenideElement loginButton = $("[data-test-id=action-login]");
     private SelenideElement errorMessage = $("[data-test-id=error-notification]");
 
-    public VerificationPage validAuth(DataHelper.AuthInfo info) {
+    public void setValue(DataHelper.AuthInfo info) {
         loginField.setValue(info.getLogin());
         passwordField.setValue(info.getPassword());
         loginButton.click();
+    }
+    public VerificationPage validAuth(DataHelper.AuthInfo info) {
+        setValue(info);
         return new VerificationPage();
     }
 
     public void invalidAuth(DataHelper.AuthInfo info) {
-        loginField.setValue(info.getLogin());
-        passwordField.setValue(info.getPassword());
-        loginButton.click();
+        setValue(info);
         errorMessage.shouldBe(Condition.visible);
     }
 
@@ -35,10 +38,8 @@ public class LoginPage {
     }
 
     public void sendInvalidPasswordThirdTime(String password) {
-        passwordField.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        passwordField.doubleClick().sendKeys(Keys.DELETE);
-        passwordField.sendKeys(password);
-        loginButton.click();
+        sendInvalidPassword(password);
+        sendInvalidPassword(password);
         loginButton.shouldBe(Condition.disabled);
     }
 }
